@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+
+  python-service:
+    build: ./python-service
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql://user:password@host:port/db"
+      JAVA_SERVICE_URL: "http://java-service:8080"
+
+  java-service:
+    build: ./java-service
+    ports:
+      - "8080:8080"
