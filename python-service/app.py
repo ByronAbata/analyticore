@@ -1,5 +1,5 @@
 # app/models/job.py
-from sqlalchemy import Column, String, Text, DateTime, DECIMAL, ARRAY
+from sqlalchemy import Column, String, Text, DateTime, DECIMAL, ARRAY, Integer
 from database import Base
 import uuid
 from datetime import datetime
