@@ -5,6 +5,7 @@ WORKDIR /app
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     gcc \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -12,10 +13,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Script de inicio que inicializa la DB y luego ejecuta la app
+# Script de inicio que espera PostgreSQL, inicializa la DB y luego ejecuta la app
 RUN echo '#!/bin/bash\n\
+echo "Waiting for PostgreSQL..."\n\
+while ! nc -z postgres 5432; do\n\
+  sleep 1\n\
+done\n\
+echo "PostgreSQL is ready!"\n\
 python init_db.py\n\
-exec uvicorn main:app --host 0.0.0.0 --port 8000\n\
+exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 EXPOSE 8000

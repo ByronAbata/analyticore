@@ -3,16 +3,37 @@ services:
     build: ./frontend
     ports:
       - "3000:80"
+    depends_on:
+      - python-service
 
   python-service:
     build: ./python-service
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: "postgresql://user:password@host:port/db"
+      PORT: 8000
+      DATABASE_URL: "postgresql://myuser:mypassword@postgres:5432/mydatabase"
       JAVA_SERVICE_URL: "http://java-service:8080"
+    depends_on:
+      - java-service
+      - postgres
 
   java-service:
     build: ./java-service
     ports:
       - "8080:8080"
+
+  postgres:
+    image: postgres:15
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
